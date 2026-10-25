@@ -1639,7 +1639,7 @@ footer .container div { font-family:'Cormorant Garamond', Georgia, serif; font-s
 .empty-state p { color:var(--muted-ink); }
 /* Forms: paper laid over a softly illustrated journal desk */
 .auth-page, .unlock-page, .form-page { position:relative; }
-.auth-page { min-height:580px; display:flex; justify-content:flex-end; align-items:center; padding:28px clamp(10px,4vw,54px); border-radius:22px; overflow:hidden; background:linear-gradient(90deg,rgba(24,39,32,.08),rgba(24,39,32,.02)),url('journal_scene.webp') left center/cover no-repeat,#dfb894; box-shadow:var(--shadow); }
+.auth-page { min-height:580px; display:flex; justify-content:flex-end; align-items:center; padding:28px clamp(10px,4vw,54px); border-radius:22px; overflow:hidden; background:linear-gradient(90deg,rgba(35,25,19,.30),rgba(35,25,19,.08) 55%,rgba(255,246,231,.10)),url('https://images.unsplash.com/photo-1723754166046-6d55777d54d0?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000') left center/cover no-repeat,#dfb894; box-shadow:var(--shadow); }
 .auth-page::before { content:'Write. Reflect. Grow.\A Your thoughts deserve a safe place.'; white-space:pre; position:absolute; left:7%; top:17%; max-width:260px; color:#fff8e9; font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-size:clamp(25px,3vw,42px); line-height:1.15; text-shadow:0 2px 14px rgba(25,22,16,.55); }
 .auth-card { width:min(100%,430px); padding:36px 34px; border:1px solid rgba(255,255,255,.8); border-radius:5px 18px 8px 5px; background:rgba(255,248,235,.96); box-shadow:0 22px 55px rgba(37,24,16,.25); position:relative; }
 .auth-card::before { content:' '; position:absolute; top:-8px; right:32px; width:80px; height:20px; background:rgba(201,154,80,.5); transform:rotate(3deg); }
@@ -1671,7 +1671,7 @@ footer .container div { font-family:'Cormorant Garamond', Georgia, serif; font-s
 .encryption-info-icon { font-size:21px; }
 .form-buttons { display:flex; justify-content:flex-end; gap:10px; margin-top:22px; }
 /* Locked diary */
-.locked-page { padding:25px; border-radius:20px; background:linear-gradient(90deg,rgba(255,248,235,.93),rgba(255,248,235,.84)),url('diary_scene.webp') right top/contain no-repeat; border:1px solid #e7cfb1; box-shadow:var(--shadow); }
+.locked-page { padding:25px; border-radius:20px; background:linear-gradient(90deg,rgba(255,248,235,.93),rgba(255,248,235,.84)),url('https://images.unsplash.com/photo-1723754166126-cadbccbe8820?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000') right center/cover no-repeat; border:1px solid #e7cfb1; box-shadow:var(--shadow); }
 .locked-header { padding:22px; text-align:center; }
 .locked-hero { max-width:650px; margin:0 auto 24px; text-align:center; }
 .locked-hero h1, .diary-title { font-family:'Cormorant Garamond',Georgia,serif; font-size:clamp(35px,4vw,48px); color:#3c2920; }
@@ -1694,7 +1694,7 @@ footer .container div { font-family:'Cormorant Garamond', Georgia, serif; font-s
 .entry-full-content { white-space:pre-wrap; line-height:1.9; font-family:'Cormorant Garamond',Georgia,serif; font-size:20px; color:#4f3c30; padding:22px 0; }
 .danger-button { border:1px solid #e9c2bd; background:#fff0ed; color:#a34247; padding:11px 16px; border-radius:9px; font-weight:700; }
 .danger-button:hover { background:#fbe0dc; color:#842e35; }
-.unlock-page { min-height:570px; display:grid; place-items:center; padding:30px; border-radius:20px; background:linear-gradient(90deg,rgba(26,40,33,.15),rgba(26,40,33,.02)),url('forest_scene.webp') left center/auto 100% no-repeat,#e6d0b5; box-shadow:var(--shadow); }
+.unlock-page { min-height:570px; display:grid; place-items:center; padding:30px; border-radius:20px; background:linear-gradient(90deg,rgba(36,26,18,.36),rgba(36,26,18,.12) 55%,rgba(255,246,231,.18)),url('https://images.unsplash.com/photo-1723754166046-6d55777d54d0?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000') left center/cover no-repeat,#e6d0b5; box-shadow:var(--shadow); }
 .unlock-card { width:min(100%,460px); text-align:center; padding:34px; border-radius:7px 18px 8px 5px; border:1px solid #fff4e5; background:rgba(255,248,235,.97); box-shadow:0 22px 55px rgba(40,25,17,.22); }
 .unlock-card h1 { font-family:'Cormorant Garamond',Georgia,serif; font-size:39px; color:#3d2920; }
 .unlock-card > p { color:#8a715c; }
