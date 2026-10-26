@@ -87,6 +87,34 @@ def init_db():
         ON unlock_sessions(user_id, diary_id)
     """)
 
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS telegram_links (
+            user_id INTEGER PRIMARY KEY,
+            telegram_user_id BIGINT UNIQUE,
+            link_code VARCHAR(32) UNIQUE,
+            code_expires_at TIMESTAMP,
+            linked_at TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+    """)
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS telegram_saved (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            telegram_user_id BIGINT NOT NULL,
+            encrypted_payload TEXT NOT NULL,
+            created_at TIMESTAMP NOT NULL,
+            imported_at TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+    """)
+
+    cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_telegram_saved_user_imported
+        ON telegram_saved(user_id, imported_at)
+    """)
+
     conn.commit()
 
     cur.close()

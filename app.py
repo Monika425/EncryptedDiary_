@@ -4,6 +4,7 @@ from cryptography.fernet import Fernet, InvalidToken
 from datetime import datetime, timedelta
 import secrets
 import os
+import hmac
 
 from database import (
     get_db,
@@ -20,6 +21,12 @@ from crypto import (
     create_key,
     protect_key,
     unprotect_key
+)
+
+from telegram_integration import (
+    handle_update,
+    decrypt_staging,
+    bot_request
 )
 
 
@@ -1081,6 +1088,101 @@ def lock():
     return redirect(
         url_for("dashboard")
     )
+
+
+@app.route("/telegram", methods=["GET", "POST"])
+def telegram_settings():
+    if not logged_in():
+        return redirect(url_for("login"))
+
+    link = fetch_one("SELECT * FROM telegram_links WHERE user_id = %s", (session["user_id"],))
+    if not link:
+        execute("INSERT INTO telegram_links (user_id) VALUES (%s)", (session["user_id"],))
+        link = fetch_one("SELECT * FROM telegram_links WHERE user_id = %s", (session["user_id"],))
+
+    if request.method == "POST":
+        if link.get("telegram_user_id"):
+            flash("Telegram is already connected. Disconnect it from the bot with /unlink before linking another account.", "error")
+        else:
+            code = secrets.token_urlsafe(6).replace("-", "A").replace("_", "B").upper()
+            expires = current_time() + timedelta(minutes=10)
+            execute("UPDATE telegram_links SET link_code = %s, code_expires_at = %s WHERE user_id = %s", (code, expires, session["user_id"]))
+            flash("Connection code generated. Send /link " + code + " to @EnchantedPagesBot within 10 minutes.", "success")
+        return redirect(url_for("telegram_settings"))
+
+    link = fetch_one("SELECT * FROM telegram_links WHERE user_id = %s", (session["user_id"],))
+    pending = fetch_one("SELECT COUNT(*) AS total FROM telegram_saved WHERE user_id = %s AND imported_at IS NULL", (session["user_id"],))
+    return render_template("telegram.html", link=link, pending_count=int(pending["total"]))
+
+
+@app.route("/telegram/webhook", methods=["POST"])
+def telegram_webhook():
+    expected = os.getenv("TELEGRAM_WEBHOOK_SECRET", "").strip()
+    supplied = request.headers.get("X-Telegram-Bot-Api-Secret-Token", "")
+    if not expected or not hmac.compare_digest(expected, supplied):
+        return {"ok": False}, 403
+    update = request.get_json(silent=True) or {}
+    try:
+        handle_update(update)
+    except Exception as error:
+        app.logger.exception("Telegram update failed: %s", error)
+    return {"ok": True}
+
+
+@app.route("/diary/<int:diary_id>/telegram-import", methods=["GET", "POST"])
+def telegram_import(diary_id):
+    if not logged_in():
+        return redirect(url_for("login"))
+    diary = get_user_diary(diary_id)
+    if not diary:
+        flash("Diary not found.", "error")
+        return redirect(url_for("dashboard"))
+    key = get_unlock_key(diary_id)
+    if not key:
+        flash("Unlock this diary before importing Telegram entries.", "error")
+        return redirect(url_for("unlock_diary", diary_id=diary_id))
+
+    link = fetch_one("SELECT telegram_user_id FROM telegram_links WHERE user_id = %s", (session["user_id"],))
+    saved = []
+    if link and link["telegram_user_id"] is not None:
+        rows = fetch_all("SELECT id, encrypted_payload, created_at FROM telegram_saved WHERE user_id = %s AND imported_at IS NULL ORDER BY created_at DESC", (session["user_id"],))
+        for row in rows:
+            try:
+                payload = __import__("json").loads(decrypt_staging(row["encrypted_payload"]))
+                saved.append({"id": row["id"], "title": payload.get("title", "Telegram Memory"), "content": payload.get("content", ""), "created_at": row["created_at"]})
+            except Exception:
+                continue
+
+    if request.method == "POST":
+        if not link or link["telegram_user_id"] is None:
+            flash("Connect Telegram first.", "error")
+            return redirect(url_for("telegram_settings"))
+        ids = request.form.getlist("saved_ids")
+        if not ids:
+            flash("Select at least one Telegram entry to import.", "error")
+            return redirect(url_for("telegram_import", diary_id=diary_id))
+        cipher = Fernet(key)
+        imported = 0
+        for saved_id in ids:
+            row = fetch_one("SELECT id, encrypted_payload FROM telegram_saved WHERE id = %s AND user_id = %s AND imported_at IS NULL", (saved_id, session["user_id"]))
+            if not row:
+                continue
+            try:
+                payload = __import__("json").loads(decrypt_staging(row["encrypted_payload"]))
+                title = str(payload.get("title") or "Telegram Memory")[:200]
+                content = str(payload.get("content") or "")
+                if not content:
+                    continue
+                now = current_time()
+                execute("INSERT INTO entries (diary_id, encrypted_title, encrypted_content, created_at, updated_at) VALUES (%s, %s, %s, %s, %s)", (diary_id, cipher.encrypt(title.encode()).decode(), cipher.encrypt(content.encode()).decode(), now, now))
+                execute("UPDATE telegram_saved SET imported_at = %s WHERE id = %s AND user_id = %s", (now, row["id"], session["user_id"]))
+                imported += 1
+            except Exception:
+                continue
+        flash(f"Imported {imported} Telegram entr{'y' if imported == 1 else 'ies'} and encrypted them in this diary.", "success" if imported else "error")
+        return redirect(url_for("unlocked_diary", diary_id=diary_id))
+
+    return render_template("telegram_import.html", diary=diary, saved=saved, link=link)
 
 
 if __name__ == "__main__":

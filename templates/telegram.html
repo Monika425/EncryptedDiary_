@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Telegram Import · Encrypted Diary{% endblock %}
+{% block content %}
+<section class="story-page">
+  <a href="{{ url_for('dashboard') }}" class="back-link"><i data-lucide="arrow-left"></i> All diaries</a>
+  <section class="story-hero unlocked-hero" data-random-wallpaper="true"><div class="story-hero-shade"></div><div class="story-hero-content"><span class="story-kicker"><i data-lucide="send"></i> ENCHANTED PAGES</span><h1>Bring your words home.</h1><p>Connect your own Telegram account and import saved messages into a diary you unlock.</p></div><div class="story-stamp unlocked-stamp"><i data-lucide="book-lock"></i><span>PRIVATE<br>MEMORIES</span></div></section>
+  <section class="collection-section">
+    <div class="section-head"><div><p class="kicker">TELEGRAM CONNECTION</p><h2>Your messenger, your diary</h2><p>Each Encrypted Diary account connects to one Telegram account.</p></div></div>
+    <div class="empty-card" style="text-align:left;max-width:760px;margin:0 auto">
+      {% if link and link.telegram_user_id %}
+        <div class="empty-mark"><i data-lucide="check-circle-2"></i></div><p class="kicker">CONNECTION ACTIVE</p><h2>Telegram is connected</h2><p>Your saved Telegram messages are private to this Encrypted Diary account. Pending entries: <strong>{{ pending_count }}</strong>.</p>
+        <div class="hero-actions"><a class="button primary" href="https://t.me/EnchantedPagesBot" target="_blank" rel="noopener"><i data-lucide="send"></i> Open Enchanted Pages</a><a class="button secondary" href="{{ url_for('dashboard') }}"><i data-lucide="book-open"></i> Choose a diary</a></div>
+        <p style="margin-top:1.5rem">To disconnect, send <code>/unlink</code> to <a href="https://t.me/EnchantedPagesBot" target="_blank" rel="noopener">@EnchantedPagesBot</a>.</p>
+      {% else %}
+        <div class="empty-mark"><i data-lucide="link-2"></i></div><p class="kicker">ONE-TIME ACCOUNT LINKING</p><h2>Connect your Telegram</h2><p>Generate a short-lived code, then send it to the bot. The code expires after 10 minutes.</p>
+        <form method="post"><button class="button primary" type="submit"><i data-lucide="key-round"></i> Generate connection code</button></form>
+        {% if link and link.link_code and link.code_expires_at %}<div class="journal-note" style="margin-top:1.5rem"><i data-lucide="shield-check"></i><div><strong>Your connection code</strong><p>Send <code>/link {{ link.link_code }}</code> to <a href="https://t.me/EnchantedPagesBot" target="_blank" rel="noopener">@EnchantedPagesBot</a> before it expires.</p><p>Expires: {{ link.code_expires_at }}</p></div></div>{% endif %}
+      {% endif %}
+    </div>
+    <div class="journal-note" style="max-width:760px;margin:1.5rem auto 0"><i data-lucide="info"></i><div><strong>How /save works</strong><p>Send <code>/save Title | your message</code> to the bot. You can also reply to a text message with <code>/save</code>. The bot stages the text encrypted until you choose a diary and import it. Imported entries are encrypted with that diary's key.</p></div></div>
+  </section>
+</section>
+{% endblock %}

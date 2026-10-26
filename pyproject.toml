@@ -6,5 +6,6 @@ dependencies = [
     "Flask==2.3.3",
     "cryptography",
     "Werkzeug==2.3.7",
-    "psycopg2-binary"
+    "psycopg2-binary",
+    "requests>=2.31.0"
 ]
